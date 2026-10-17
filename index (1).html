@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Place Called Home</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@1,6..72,300;1,6..72,400&display=swap">
+<style>
+:root {
+  --bg: #fbfbfd;
+  --fg: #1f2433;
+  --soft: #6b7084;
+  --accent: #c9822b;
+  --card: #ffffff;
+  --line: #e6e7ee;
+  --display: "Instrument Serif", Georgia, serif;
+  --body: "Newsreader", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161d; --fg: #ecebf2; --soft: #9a9cad;
+    --accent: #f0b46a; --card: #1d2029; --line: #2b2e3a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  padding: 4rem max(16px, env(safe-area-inset-left, 0px)) 3rem;
+}
+main {
+  max-width: 720px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 3rem;
+}
+header { text-align: center; display: flex; flex-direction: column; gap: 0.6rem; }
+.eyebrow {
+  font-family: system-ui, sans-serif; font-size: 0.72rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--accent); margin: 0;
+}
+h1 {
+  font-family: var(--display); font-weight: 400; margin: 0;
+  font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 1.05; text-wrap: balance;
+}
+h1 em { color: var(--accent); }
+
+.poem {
+  width: 100%; max-width: 32rem;
+  font-size: clamp(1.15rem, 3.4vw, 1.4rem); font-style: italic; font-weight: 300;
+  line-height: 1.7;
+}
+.poem p { margin: 0; min-height: 1.7em; }
+.poem .gap { min-height: 1em; }
+.poem .last { color: var(--accent); font-weight: 400; }
+.caret {
+  display: inline-block; width: 1px; height: 1.1em; vertical-align: -0.15em;
+  background: var(--accent); margin-left: 2px; animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.photos {
+  width: 100%;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.4rem;
+}
+.photos figure {
+  margin: 0; background: var(--card); padding: 10px 10px 14px;
+  border: 1px solid var(--line); border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  transition: transform .25s;
+}
+.photos figure:nth-child(odd) { transform: rotate(-1.5deg); }
+.photos figure:nth-child(even) { transform: rotate(1.5deg); }
+.photos figure:hover { transform: rotate(0) scale(1.03); }
+.photos img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border-radius: 2px; }
+.photos figcaption {
+  font-family: var(--display); font-style: italic; font-size: 1.1rem;
+  text-align: center; margin-top: 8px; color: var(--soft);
+}
+
+footer { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.sign { font-family: var(--display); font-style: italic; font-size: 1.3rem; color: var(--soft); margin: 0; }
+button {
+  font-family: system-ui, sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+  background: transparent; color: var(--soft); border: 1px solid var(--line);
+  border-radius: 999px; padding: 0.6rem 1.2rem; cursor: pointer;
+}
+button:hover { color: var(--accent); border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .caret { animation: none; } .photos figure { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Class of 2026</p>
+    <h1>Happy Graduation, <em>my dearest friends</em></h1>
+  </header>
+
+  <div class="poem" id="poem" aria-live="polite"></div>
+
+  <section class="photos" id="photos"></section>
+
+  <footer>
+    <p class="sign">with love, your friend</p>
+    <button type="button" id="replay">Read it again</button>
+  </footer>
+</main>
+
+<script>
+/* ===== EDIT YOUR PHOTOS HERE =====
+   Upload your photos to the same place as this index.html,
+   then list each file name and a short caption below.
+   Photos that can't be found are hidden automatically. */
+const photos = [
+  { file: "photo1.jpg", caption: "first day" },
+  { file: "photo2.jpg", caption: "late nights" },
+  { file: "photo3.jpg", caption: "our table" },
+  { file: "photo4.jpg", caption: "always laughing" },
+  { file: "photo5.jpg", caption: "the trip" },
+  { file: "photo6.jpg", caption: "we made it" },
+];
+
+const lines = [
+  "No matter how far your wings may carry you,",
+  "across new skies and unfamiliar skylines,",
+  "",
+  "never forget the ones who walked beside you,",
+  "who filled the empty pages of your days,",
+  "and wrote these chapters with you, line by line.",
+  "",
+  "For wherever the wind may take you,",
+  "there will always be a place called home,",
+  "a door left open, a light left on,",
+  "waiting for you to return,",
+  "again, and again."
+];
+
+/* Photos */
+const grid = document.getElementById("photos");
+photos.forEach(p => {
+  const fig = document.createElement("figure");
+  const img = document.createElement("img");
+  img.src = p.file; img.alt = p.caption; img.loading = "lazy";
+  img.onerror = () => { fig.remove(); if (!grid.children.length) grid.hidden = true; };
+  const cap = document.createElement("figcaption");
+  cap.textContent = p.caption;
+  fig.append(img, cap);
+  grid.appendChild(fig);
+});
+
+/* Poem typing */
+const poem = document.getElementById("poem");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let run = 0;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function build() {
+  poem.innerHTML = "";
+  return lines.map((t, i) => {
+    const p = document.createElement("p");
+    if (!t) p.className = "gap";
+    if (i === lines.length - 1) p.classList.add("last");
+    poem.appendChild(p);
+    return p;
+  });
+}
+function showAll() { build().forEach((p, i) => p.textContent = lines[i]); }
+
+async function typePoem() {
+  const id = ++run, ps = build();
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  await wait(500);
+  for (let i = 0; i < lines.length; i++) {
+    if (id !== run) return;
+    ps[i].appendChild(caret);
+    for (const ch of lines[i]) {
+      if (id !== run) return;
+      caret.before(ch);
+      await wait(ch === "," ? 200 : 40);
+    }
+    await wait(lines[i] ? 400 : 200);
+  }
+}
+document.getElementById("replay").addEventListener("click", () => reduce ? showAll() : typePoem());
+reduce ? showAll() : typePoem();
+</script>
+</body>
+</html>
